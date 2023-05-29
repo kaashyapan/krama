@@ -1,0 +1,34 @@
+
+type BProvider { 
+    Bname: string 
+}
+
+type BThumbnail { 
+    Bwidth: i32 
+    Bheight: i32 
+}
+
+type BImage { 
+    Bthumbnail: optional<BThumbnail> 
+}
+
+type BVideo { 
+    Bthumbnail: optional<BThumbnail> 
+}
+
+type BSearchResult { 
+      Bname: string
+      Burl: string
+      Bdescription: string
+      BdatePublished: string
+      Bimage: optional<BImage> 
+      Bvideo: optional<BVideo>
+      Bprovider: []BProvider 
+}
+
+
+type BPayload {
+    BreadLink: string
+    BtotalEstimatedMatches: i32
+    Bvalue: []BSearchResult 
+}

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Targetframework>net7.0</Targetframework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Serializer.fs" />
+    <Compile Include="Deserializer.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Expecto" Version="9.0.4" />
+ </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../src/Krama.Json.fsproj" />
+  </ItemGroup>
+
+</Project>

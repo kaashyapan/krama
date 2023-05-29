@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Targetframework>net7.0</Targetframework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Samples.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="BareTypes.fs" />
+    <Compile Include="BareHelpers.fs" />
+    <Compile Include="Krama.Json.fs" />
+    <Compile Include="Thoth.fs" />
+    <Compile Include="Newtonsoft.fs" />
+    <Compile Include="Deserialize.fs" />
+    <Compile Include="Serialize.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BareFs" Version="0.1.1" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="FSharp.SystemTextJson" Version="0.19.13" />
+    <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.11.7" />
+    <PackageReference Include="Thoth.Json.Net" Version="9.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../json/src/Krama.Json.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Krama.Json.dll">
+      <HintPath>~/krama/json/src/bin/Release/net7.0/Krama.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

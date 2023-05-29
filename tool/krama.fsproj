@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Version>0.1.0</Version>
+		<Authors>Kaashyapan</Authors>
+		<Description></Description>
+		<PackAsTool>true</PackAsTool>
+		<ToolCommandName>krama</ToolCommandName>
+		<PackageLicenseFile>../LICENSE</PackageLicenseFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="Config.fs" />
+		<Compile Include="Console.fs" />
+		<Compile Include="Program.fs" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <PackageReference Include="FSharpx.Extras" Version="3.1.0" />
+		<PackageReference Include="FSharp.SystemCommandLine" Version="0.15.0-beta4" />
+		<PackageReference Include="Spectre.Console" Version="0.41.0" />
+    <PackageReference Include="Legivel" Version="0.4.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="../LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+</Project>

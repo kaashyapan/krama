@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Targetframework>net7.0</Targetframework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Kitchensink.fs" />
+    <Compile Include="Kitchensink.json.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../json/src/Krama.Json.fsproj"></ProjectReference>
+  </ItemGroup>
+
+</Project>
