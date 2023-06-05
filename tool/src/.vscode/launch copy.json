@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Test",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "/home/ubuntu/krama/tool/tests/bin/Debug/net7.0/Tests.dll",
+            "args": [
+                "."
+            ],
+            "cwd": "/home/ubuntu/krama/tool/tests",
+            "externalConsole": false,
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        }
+    ]
+}

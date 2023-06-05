@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Targetframework>net7.0</Targetframework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Typechecker.fs" />
+    <Compile Include="Heirarchy.fs" />
+    <Compile Include="MultiFile.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Expecto" Version="9.0.4" />
+ </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../src/krama.fsproj" />
+  </ItemGroup>
+
+</Project>

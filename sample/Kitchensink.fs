@@ -1,25 +1,36 @@
 module Kitchensink
 
 open System
+//type Address = { Street: string; State': string }
+type Name = string 
+type Persons = Name list
+type Model = {
+  allpersons: Persons option
+}
 
-type Address = { Street: string; State': string }
 
-type Sex =
-    | Male
-    | Female
-
+(**
+type Age = {| name: string |} list
 type Pet =
     | Cat
     | Dog
 
+type Sex =
+    | Male of string
+    | Female
+
+type Cht = Choice<bool, int>
+
+type ChtResult = Result<bool, int>
+
 type Payload =
     {
         Name: string
-        Age: int
+        Age: Age
         Address: Address option
         Sex: Sex
         Pet: Pet option
-        Cht: Choice<bool, int>
+        Cht: Cht
     }
 
 let testPayload =
@@ -31,3 +42,4 @@ let testPayload =
         Pet = Some Dog
         Cht = Choice2Of2 32
     }
+*)

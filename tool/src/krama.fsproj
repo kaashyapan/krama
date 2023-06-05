@@ -9,27 +9,28 @@
 		<Description></Description>
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>krama</ToolCommandName>
-		<PackageLicenseFile>../LICENSE</PackageLicenseFile>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="Log.fs" />
+		<Compile Include="Types.fs" />
+		<Compile Include="Ast.fs" />
 		<Compile Include="Config.fs" />
+		<Compile Include="Compiler.fs" />
+		<Compile Include="CodePrinter.fs" />
+		<Compile Include="Fsfile.fs" />
 		<Compile Include="Console.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>
 
 	<ItemGroup>
     <PackageReference Include="FSharpx.Extras" Version="3.1.0" />
-		<PackageReference Include="FSharp.SystemCommandLine" Version="0.15.0-beta4" />
-		<PackageReference Include="Spectre.Console" Version="0.41.0" />
+	<PackageReference Include="FSharp.SystemCommandLine" Version="0.15.0-beta4" />
+	<PackageReference Include="Spectre.Console" Version="0.41.0" />
     <PackageReference Include="Legivel" Version="0.4.6" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="../LICENSE">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
+	<PackageReference Include="FSharp.Compiler.Service" Version="43.7.200" />
+    <PackageReference Include="Fantomas.Core" Version="6.0.3" />
+    <PackageReference Include="Regx" Version="0.3.6" />
 	</ItemGroup>
 
 </Project>

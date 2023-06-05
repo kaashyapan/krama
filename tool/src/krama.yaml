@@ -1,0 +1,21 @@
+Version: 1
+Strategy: Json
+Case: Camel #Key case strategy
+FloatAsString: false # Decimal, single & double types will be encoded as Json strings
+DateAsFloat: false # DateTime formats as floats
+Outputs:
+  - File: generates.json.fs
+    Namespace: Hello
+    Module: World
+    # Map of top level types that need to be serialized
+    Includes:
+      - Type1: # Full path of the type Namespace.Module.TypeName
+          key: val # Rename keys
+          key2: val2
+          key3: __skip__ # Do not include in Json
+
+    # List of types to exclude from code generation. Useful if you are providing your own overides for some type alias
+    Excludes:
+      - Type1
+
+  - File: generates2.json.fs
