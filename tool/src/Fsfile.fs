@@ -98,10 +98,15 @@ let processFsFiles (dir: DirectoryInfo) : Types.T list =
   |> Seq.tryHead
   |> function
     | Some fsprojfile ->
-      dir.EnumerateFiles("*.fs?", SearchOption.AllDirectories)
-      |> Seq.map (fun filename -> filename.FullName)
-      |> Seq.where (fun filename -> not <| Regex.IsMatch(filename, pattern))
-      |> Seq.map (fun f -> genModules fsprojfile.FullName f)
+      let allfiles =
+        dir.EnumerateFiles("*.fs", SearchOption.AllDirectories)
+        |> Seq.map (fun f -> f.FullName)
+        |> Seq.where (fun filename -> not <| Regex.IsMatch(filename, pattern))
+        |> Seq.sortByDescending id
+        |> Seq.toArray
+
+      allfiles
+      |> Seq.map (fun f -> genModules fsprojfile.FullName f allfiles)
       |> Seq.concat
       |> Seq.toList
 
