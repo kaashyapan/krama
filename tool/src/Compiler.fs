@@ -1,5 +1,6 @@
 module rec Krama.Compiler
 
+open System
 open System.IO
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
@@ -8,21 +9,23 @@ open FSharp.Compiler.Diagnostics
 open Krama.Types
 open Krama.Log
 open FSharpx
+open Ionide.ProjInfo
 
 let checker = FSharpChecker.Create(keepAssemblyContents = true)
 
 // Will process the type defn of a derived FSharp abbreviated type.
 // If a user defined type is encountered, dig no furthur.
 // Will be called from any of the collection / derived types
-let makeGenericArguments (projResults: FSharpCheckProjectResults) (tlist: FSharpType seq) =
+let makeGenericArguments (tlist: FSharpType seq) =
   let sharpNamespaces = [ "System"; "Microsoft.FSharp.Core"; "Microsoft.FSharp.Collections" ]
 
   tlist
   |> Seq.map (fun field ->
+    //Accesspath will not be available for anonrecords
     if field.IsAnonRecordType then
-      makeType projResults field.AbbreviatedType
+      makeType field.AbbreviatedType
     else if List.contains field.TypeDefinition.AccessPath sharpNamespaces then
-      makeType projResults field.AbbreviatedType
+      makeType field.AbbreviatedType
     else
       [ field.TypeDefinition.AccessPath; field.TypeDefinition.DisplayName ]
       |> String.concat "."
@@ -31,14 +34,14 @@ let makeGenericArguments (projResults: FSharpCheckProjectResults) (tlist: FSharp
   )
   |> Seq.toList
 
-let rec makeType (projResults: FSharpCheckProjectResults) (t: FSharpType) : T =
+let rec makeType (t: FSharpType) : T =
   //TODO structs, classes, enum, C# collection types, ValueTuple
   match t with
   | t when t.IsAnonRecordType ->
     t.GenericArguments
     |> Seq.allPairs t.AnonRecordTypeDetails.SortedFieldNames
     |> Seq.map (fun (name, field) ->
-      let f = [ field ] |> makeGenericArguments projResults |> List.head
+      let f = [ field ] |> makeGenericArguments |> List.head
       T.RecordMember(name, f)
     )
     |> Seq.toList
@@ -69,14 +72,12 @@ let rec makeType (projResults: FSharpCheckProjectResults) (t: FSharpType) : T =
       | "float32" -> T.Single
       | "double" -> T.Double
       | "float" -> T.Double
-      | "option" -> t.GenericArguments |> makeGenericArguments projResults |> List.head |> T.Option
-      | "voption" ->
-        t.GenericArguments |> makeGenericArguments projResults |> List.head |> T.VOption
-      | "valueoption" ->
-        t.GenericArguments |> makeGenericArguments projResults |> List.head |> T.VOption
-      | "result" -> t.GenericArguments |> makeGenericArguments projResults |> T.Result
-      | "array" -> t.GenericArguments |> makeGenericArguments projResults |> List.head |> T.Array
-      | "choice" -> t.GenericArguments |> makeGenericArguments projResults |> T.Choice
+      | "option" -> t.GenericArguments |> makeGenericArguments |> List.head |> T.Option
+      | "voption" -> t.GenericArguments |> makeGenericArguments |> List.head |> T.VOption
+      | "valueoption" -> t.GenericArguments |> makeGenericArguments |> List.head |> T.VOption
+      | "result" -> t.GenericArguments |> makeGenericArguments |> T.Result
+      | "array" -> t.GenericArguments |> makeGenericArguments |> List.head |> T.Array
+      | "choice" -> t.GenericArguments |> makeGenericArguments |> T.Choice
       | "exn" -> T.Exception
       | x ->
         log (Log.Err $"Unhandled {x} in Microsoft.FSharp.Core")
@@ -84,10 +85,10 @@ let rec makeType (projResults: FSharpCheckProjectResults) (t: FSharpType) : T =
 
     | "Microsoft.FSharp.Collections" ->
       match String.toLower t.TypeDefinition.DisplayName with
-      | "list" -> t.GenericArguments |> makeGenericArguments projResults |> List.head |> T.List
-      | "seq" -> t.GenericArguments |> makeGenericArguments projResults |> List.head |> T.Seq
-      | "set" -> t.GenericArguments |> makeGenericArguments projResults |> List.head |> T.Set
-      | "map" -> t.GenericArguments |> makeGenericArguments projResults |> T.Map
+      | "list" -> t.GenericArguments |> makeGenericArguments |> List.head |> T.List
+      | "seq" -> t.GenericArguments |> makeGenericArguments |> List.head |> T.Seq
+      | "set" -> t.GenericArguments |> makeGenericArguments |> List.head |> T.Set
+      | "map" -> t.GenericArguments |> makeGenericArguments |> T.Map
 
       | x ->
         log (Log.Err $"Unhandled {x} in Microsoft.FSharp.Collections")
@@ -125,11 +126,8 @@ let rec makeType (projResults: FSharpCheckProjectResults) (t: FSharpType) : T =
       | "datetimeoffset" -> T.DateTimeOffset
       | "timeonly" -> T.TimeOnly
       | "timespan" -> T.TimeSpan
-      | "array" -> t.GenericArguments |> makeGenericArguments projResults |> List.head |> T.Array
-      | "tuple" ->
-        t.GenericArguments[0].GenericArguments
-        |> makeGenericArguments projResults
-        |> T.Tuple
+      | "array" -> t.GenericArguments |> makeGenericArguments |> List.head |> T.Array
+      | "tuple" -> t.GenericArguments[0].GenericArguments |> makeGenericArguments |> T.Tuple
       | "obj" ->
         //let symbol = FSharpSymbol
         //projResults.GetUsesOfSymbol
@@ -145,12 +143,12 @@ let rec makeType (projResults: FSharpCheckProjectResults) (t: FSharpType) : T =
       |> String.concat "."
       |> T.Userdef
 
-let rec getType (projResults: FSharpCheckProjectResults) (t: FSharpEntity) : T seq =
+let rec getType (t: FSharpEntity) : T seq =
   match t with
 
   | t when t.IsFSharpAbbreviation ->
     let accessPath = String.concat "." [ t.AccessPath; t.DisplayName ]
-    let typ = makeType projResults t.AbbreviatedType
+    let typ = makeType t.AbbreviatedType
     (accessPath, typ) |> T.Alias |> Seq.singleton
 
   | t when t.IsFSharpRecord ->
@@ -159,18 +157,7 @@ let rec getType (projResults: FSharpCheckProjectResults) (t: FSharpEntity) : T s
     let typ =
       t.FSharpFields
       |> Seq.map (fun field ->
-        (**
-        if
-          field.FieldType.BasicQualifiedName = "Microsoft.FSharp.Core.obj"
-          && field.FieldType.HasTypeDefinition
-          && field.FieldType.IsAbbreviation
-        then
-          let f = T.Unresolved(field.Name)
-          T.RecordMember(field.Name, f)
-        else
-              *)
-
-        let f = [ field.FieldType ] |> makeGenericArguments projResults |> List.head
+        let f = [ field.FieldType ] |> makeGenericArguments |> List.head
         T.RecordMember(field.Name, f)
       )
       |> Seq.toList
@@ -186,7 +173,7 @@ let rec getType (projResults: FSharpCheckProjectResults) (t: FSharpEntity) : T s
       |> Seq.map (fun field ->
         let payloads =
           field.Fields
-          |> Seq.map (fun f -> [ f.FieldType ] |> makeGenericArguments projResults |> List.head)
+          |> Seq.map (fun f -> [ f.FieldType ] |> makeGenericArguments |> List.head)
           |> Seq.toList
 
         (field.Name, payloads) |> T.UnionMember
@@ -199,76 +186,60 @@ let rec getType (projResults: FSharpCheckProjectResults) (t: FSharpEntity) : T s
 
   | t when t.IsFSharpModule ->
 
-    t.GetPublicNestedEntities() |> Seq.map (getType projResults) |> Seq.concat
+    t.GetPublicNestedEntities() |> Seq.map getType |> Seq.concat
 
   | _ -> T.TypeNotSupported |> Seq.singleton
 
-let parseAndTypeCheckSingleFile (projFile, file, input, allfiles) =
+let parseAndTypeCheck (ionide: Ionide.ProjInfo.Types.ProjectOptions) =
   let projOptions =
     {
       FSharpProjectOptions.IsIncompleteTypeCheckEnvironment = false
-      LoadTime = System.DateTime.Now
+      LoadTime = ionide.LoadTime
       OriginalLoadReferences = []
-      OtherOptions = [||]
-      ProjectFileName = projFile
-      ProjectId = Some "Krama"
+      OtherOptions = ionide.OtherOptions |> List.toArray
+      ProjectFileName = ionide.ProjectFileName
+      ProjectId = ionide.ProjectId
       ReferencedProjects = [||]
-      SourceFiles = allfiles
+      SourceFiles = ionide.SourceFiles |> List.toArray
       Stamp = None
       UnresolvedReferences = None
       UseScriptResolutionRules = false
     }
 
-  let projResults = checker.ParseAndCheckProject(projOptions, file) |> Async.RunSynchronously
+  let projResults = checker.ParseAndCheckProject(projOptions, "krama") |> Async.RunSynchronously
 
-  match projResults.HasCriticalErrors with
-  | false ->
-    let severeErrorCount =
-      projResults.Diagnostics
-      |> Seq.where (fun diag ->
-        diag.Severity = FSharpDiagnosticSeverity.Error
-        && Seq.exists (fun f -> f = diag.FileName) allfiles
-      )
-      |> Seq.map (fun diag ->
-        log (
-          Log.Err(
-            sprintf
-              "Error in %s. Line %d Position %d"
-              diag.FileName
-              diag.StartLine
-              diag.StartColumn
-          )
+  let severeErrorCount =
+    projResults.Diagnostics
+    |> Array.where (fun diag -> diag.Severity = FSharpDiagnosticSeverity.Error)
+    |> Array.map (fun diag ->
+      log (
+        Log.Err(
+          sprintf
+            "Error in %s. Line %d Position %d - %s"
+            diag.FileName
+            diag.StartLine
+            diag.StartColumn
+            diag.Message
         )
-
-        diag
       )
-      |> Seq.length
 
-    (**
-    projResults.GetAllUsesOfAllSymbols()
-    |> Array.where (fun e -> e.IsFromDefinition)
-    |> Array.map (fun e ->
-      printfn "Symbol use - %A" e.Symbol
-      e
+      diag
     )
-    |> Array.map (fun e ->
-      printfn "Symbol use - %A" (projResults.GetUsesOfSymbol(e.Symbol))
-      e
-    )
-    |> ignore
-  *)
+    |> Array.length
 
+  match projResults.HasCriticalErrors || severeErrorCount <> 0 with
+  | false ->
     projResults.AssemblySignature.Entities
-    |> Seq.map (fun e -> e.GetPublicNestedEntities())
-    |> Seq.concat
-    |> Seq.map (getType projResults)
+    |> Seq.map getType
     |> Seq.concat
     |> Seq.toList
 
-  | true -> failwithf "Parsing did not finish... (%A)" projResults.Diagnostics
+  | true ->
+    log (Log.Err "Typechecking unsuccessful. Check your project for compiler errors")
+    []
 
-let rec genModules (projFile: string) (file: string) (allfiles: string array) =
-
-  let text = File.ReadAllText(file)
-
-  parseAndTypeCheckSingleFile (projFile, file, SourceText.ofString text, allfiles)
+let processFsFiles (fsProjFile: FileInfo) : Types.T list =
+  let toolsPath = Init.init fsProjFile.Directory None
+  let loader: IWorkspaceLoader = WorkspaceLoader.Create(toolsPath, [])
+  let projectOptions = loader.LoadProjects([ fsProjFile.FullName ]) |> Seq.toArray |> Array.head
+  parseAndTypeCheck projectOptions

@@ -7,23 +7,22 @@ open Krama.Compiler
 open Expecto
 open FSharpx
 
-let processFile (path: string) =
-  printfn "%A" path
-  let typs = path |> genModules
-  path, typs
-
 let tests =
-  Directory.EnumerateFiles("./heirarchy", "*.fsx")
-  |> Seq.map processFile
+  Directory.EnumerateDirectories("./heirarchy") 
+  |> Seq.where (fun x -> not <| String.contains @"/." x)
+  //|> Seq.where (fun x -> String.contains @"multi" x)
+  //|> (fun x -> printfn "%A" x ; x)
+  |> Seq.map (fun dir -> sprintf "%s/%s" dir "test.fsproj")
   |> Seq.toList
-  |> List.map (fun (path, types) ->
+  |> List.map (fun projfile  ->
     let testname =
-      path
+      projfile
       |> String.splitChar [| '/' |]
-      |> Array.last
-      |> String.splitChar [| '.' |]
+      |> Array.rev
+      |> Array.tail
       |> Array.head
 
+    let types = Krama.Compiler.processFsFiles <| FileInfo(projfile)
     let actual = Krama.Types.getTypeHeirarchy types "Test.Model"
 
     let expected =

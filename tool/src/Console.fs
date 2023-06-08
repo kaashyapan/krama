@@ -4,7 +4,7 @@ open System
 open System.IO
 open Krama.Config
 open Krama.Log
-open Krama.Files
+open Krama.Compiler
 open Krama.CodePrinter
 
 type Args = { YamlFile: IO.FileInfo; Version: string }
@@ -54,23 +54,23 @@ let processOptions (yamlFile: FileInfo option) =
 
 //////////////// dir processing //////////////////
 
-let loadProj (dir: DirectoryInfo) (yamlFile: IO.FileInfo option) =
-  match dir.Exists with
+let loadProj (fsProjFile: FileInfo) (yamlFile: IO.FileInfo option) =
+  match fsProjFile.Exists with
   | true ->
-    log (Log.Info $"Loading {dir.FullName}/*")
+    log (Log.Info $"Loading {fsProjFile.FullName}/*")
+    let projectRoot = fsProjFile.Directory
 
     yamlFile
     |> processOptions
     |> Result.map (fun config ->
-      let types = dir |> processFsFiles
-      printfn "%A" types
+      let types = processFsFiles fsProjFile
 
       match config with
-      | Json jsonConfig -> writeJson jsonConfig types
-      | Bare bareConfig -> writeBare bareConfig types
+      | Json jsonConfig -> writeJson projectRoot jsonConfig types
+      | Bare bareConfig -> writeBare projectRoot bareConfig types
+
+      log (Log.Msg "Serializers have been generated")
     )
     |> ignore
 
-    log (Log.Msg "Serializers have been generated")
-
-  | false -> log (Log.Err $"{dir} not found.")
+  | false -> log (Log.Err $"{fsProjFile} not found.")

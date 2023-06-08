@@ -50,7 +50,6 @@ type T =
   | Result of T list
   | Exception
   | TypeNotSupported
-  | Unresolved
 
 let rec getDepTypes (acc: T list, alltypes: T List) (topType: T) : (T List * T list) =
   match topType with

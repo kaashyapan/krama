@@ -1,6 +1,7 @@
 module Model
 
 open System
+open Types
 
 type Person =
     {

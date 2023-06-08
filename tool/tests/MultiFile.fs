@@ -33,12 +33,11 @@ let config () =
   }
 
 let tests =
-    let dir = DirectoryInfo("/home/ubuntu/krama/tool/tests/multi_file") 
-    let typs = Krama.Files.processFsFiles dir
-    let typeHeirarchy = Krama.CodePrinter.writeJson (config()) typs 
-    let actual = []
-    let expected = []
+    let fsproj = FileInfo("/home/ubuntu/krama/tool/tests/multi_file/Sample.fsproj") 
+    let typs = Krama.Compiler.processFsFiles fsproj
+    let actual = List.length typs
+    let expected = 9 
 
     [
-      test "testname" { Expect.sequenceContainsOrder actual expected "Multi file inputs" }
+      test "testname" { Expect.equal actual expected "Multi file inputs" }
     ]

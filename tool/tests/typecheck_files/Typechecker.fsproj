@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Targetframework>net7.0</Targetframework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="./string.fs" />
+    <Compile Include="./int8.fs" />
+    <Compile Include="./int16.fs" />
+    <Compile Include="./int32.fs" />
+    <Compile Include="./int64.fs" />
+    <Compile Include="./uint8.fs" />
+    <Compile Include="./uint16.fs" />
+    <Compile Include="./uint32.fs" />
+    <Compile Include="./uint64.fs" />
+    <Compile Include="./single.fs" />
+    <Compile Include="./half.fs" />
+    <Compile Include="./double.fs" />
+    <Compile Include="./guid.fs" />
+    <Compile Include="./exception.fs" />
+    <Compile Include="./seq.fs" />
+    <Compile Include="./set.fs" />
+    <Compile Include="./list.fs" />
+    <Compile Include="./array.fs" />
+    <Compile Include="./anon_record.fs" />
+    <Compile Include="./record.fs" />
+    <Compile Include="./result.fs" />
+    <Compile Include="./tuple.fs" />
+    <Compile Include="./option.fs" />
+    <Compile Include="./voption.fs" />
+    <Compile Include="./module.fs" />
+    <Compile Include="./dateonly.fs" />
+    <Compile Include="./datetime.fs" />
+    <Compile Include="./datetimeoffset.fs" />
+    <Compile Include="./dep_alias.fs" />
+    <Compile Include="./dep_multi.fs" />
+    <Compile Include="./dep_union.fs" />
+    <Compile Include="./dep_record.fs" />
+    <Compile Include="./timeonly.fs" />
+    <Compile Include="./timespan.fs" />
+    <Compile Include="./union_with.fs" />
+    <Compile Include="./union_nested.fs" />
+    <Compile Include="./union_simple.fs" />
+  </ItemGroup>
+
+</Project>

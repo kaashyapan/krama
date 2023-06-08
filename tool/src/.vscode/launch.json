@@ -8,7 +8,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceRoot}/bin/Debug/net7.0/krama.dll",
             "args": [
-                "/home/ubuntu/krama/tool/tests/multi_file"
+                "/home/ubuntu/krama/tool/tests/heirarchy/multi_module/test.fsproj"
             ],
             "cwd": "${workspaceRoot}",
             "externalConsole": false,
