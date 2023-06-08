@@ -56,19 +56,6 @@ type Encoders() =
         }
         |> JsonNode.encode
 
-type Payload with
-
-    static member encode(p: Payload) : JsonNode =
-        seq {
-            ("Name", JsonNode.encode p.Name)
-            ("Age", JsonNode.encode p.Age)
-            ("Address", Encoders.encode p.Address)
-            ("Sex", Encoders.encode p.Sex)
-            ("Pet", Encoders.encode p.Pet)
-            ("Cht", Encoders.encode p.Cht)
-        }
-        |> JsonNode.encode
-
 [<Extension>]
 type Decoders() =
     [<Extension>]
@@ -134,10 +121,23 @@ type Decoders() =
         }
 
     [<Extension>]
-    static member AsPayloadOrNone(j: JsonNode) : Payload option = j.AsPayload() |> Some
+    static member AsPayloadOrNone(j: JsonNode) : Payload option = 
+        printfn "%A" j
+        match j.typ with
+        | JObject [||] -> None 
+        | JObject _ -> j.AsPayload() |> Some 
+        | JNull -> None 
+        | _ -> failwith "Unexpected value"
 
     [<Extension>]
     static member AsPayloadOrNone(j: JsonNode option) : Payload option =
         match j with
         | Some node -> node.AsPayloadOrNone()
         | None -> None
+
+type Payload with
+      static member toJson(p: Payload) : string =
+        let encoder (p: Payload) = Encoders.encode p
+        Json.serialize encoder p
+
+      static member ofJson(jstr) : Payload = Json.parse Decoders.AsPayload jstr
