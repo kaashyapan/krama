@@ -57,7 +57,7 @@ let rec getDepTypes (acc: T list, alltypes: T List) (topType: T) : (T List * T l
     let dependencies = str |> getTypeHeirarchy alltypes
     let acc' = acc @ dependencies
     acc', alltypes
-  | T.Option t -> getDepTypes ( topType :: acc, alltypes) t
+  | T.Option t -> getDepTypes (topType :: acc, alltypes) t
   | T.VOption t -> getDepTypes (topType :: acc, alltypes) t
   | T.List t -> getDepTypes (topType :: acc, alltypes) t
   | T.Seq t -> getDepTypes (topType :: acc, alltypes) t
@@ -72,7 +72,10 @@ let rec getDepTypes (acc: T list, alltypes: T List) (topType: T) : (T List * T l
   | T.AnonRecord tlist -> List.fold getDepTypes (topType :: acc, alltypes) tlist
   | T.UnionMember(_, tlist) -> List.fold getDepTypes (topType :: acc, alltypes) tlist
   | T.RecordMember(_, t) -> getDepTypes (topType :: acc, alltypes) t
-  | T.AnonRec tlist -> tlist |> List.map (fun (_, t) -> t) |> List.fold getDepTypes (topType :: acc, alltypes)
+  | T.AnonRec tlist ->
+    tlist
+    |> List.map (fun (_, t) -> t)
+    |> List.fold getDepTypes (topType :: acc, alltypes)
   | T.Alias(str, t) -> getDepTypes (acc, alltypes) t
   | _ -> (acc, alltypes)
 

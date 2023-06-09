@@ -51,26 +51,48 @@ let processOptions (yamlFile: FileInfo option) =
     }
 
   getConfig (args)
+  |> Result.map (fun config ->
+    Directory.SetCurrentDirectory(args.YamlFile.Directory.FullName)
+    config
+  )
 
 //////////////// dir processing //////////////////
 
-let loadProj (fsProjFile: FileInfo) (yamlFile: IO.FileInfo option) =
-  match fsProjFile.Exists with
-  | true ->
-    log (Log.Info $"Loading {fsProjFile.FullName}/*")
-    let projectRoot = fsProjFile.Directory
+let getProjFile (config: Config) =
 
-    yamlFile
-    |> processOptions
-    |> Result.map (fun config ->
+  match config with
+  | Json jsonConfig -> jsonConfig.FsProjFile
+  | Bare bareConfig -> bareConfig.FsProjFile
+  |> (fun file ->
+    let projfile = FileInfo(file)
+
+    match projfile.Exists with
+    | true ->
+      log (Log.Info $"Loading {projfile.FullName}")
+      Ok projfile
+    | false ->
+      log (Log.Err $"{projfile} not found.")
+      Error $"{projfile} not found."
+  )
+
+let loadProj (yamlFile: IO.FileInfo option) =
+  let config = yamlFile |> processOptions
+  let projfile = Result.map getProjFile config
+
+  yamlFile
+  |> processOptions
+  |> Result.map (fun config ->
+    config
+    |> getProjFile
+    |> Result.map (fun fsProjFile ->
+      Directory.SetCurrentDirectory(fsProjFile.Directory.FullName)
       let types = processFsFiles fsProjFile
 
       match config with
-      | Json jsonConfig -> writeJson projectRoot jsonConfig types
-      | Bare bareConfig -> writeBare projectRoot bareConfig types
+      | Json jsonConfig -> writeJson jsonConfig types
+      | Bare bareConfig -> writeBare bareConfig types
 
       log (Log.Msg "Serializers have been generated")
     )
-    |> ignore
-
-  | false -> log (Log.Err $"{fsProjFile} not found.")
+  )
+  |> ignore

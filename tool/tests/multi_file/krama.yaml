@@ -1,5 +1,6 @@
 Version: 1
 Strategy: Json
+FsProjFile: "./Sample.fsproj"
 Case: Camel #Key case strategy
 FloatAsString: false # Decimal, single & double types will be encoded as Json strings
 DateAsFloat: false # DateTime formats as floats

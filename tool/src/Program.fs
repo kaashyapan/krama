@@ -5,8 +5,7 @@ open Krama.Console
 open FSharp.SystemCommandLine
 open System.IO
 
-let handler (path: FileInfo, yamlFile: IO.FileInfo option) =
-  ignore <| Console.loadProj path yamlFile
+let handler (yamlFile: IO.FileInfo option) = ignore <| Console.loadProj yamlFile
 
 [<EntryPoint>]
 let main argv =
@@ -14,10 +13,9 @@ let main argv =
     description "Krama serializer/deserializer codegen for F#"
 
     inputs (
-      Input.Argument<FileInfo>("fsprojFile", "Path to the fsproj file"),
       Input.OptionMaybe<IO.FileInfo>(
         [ "-f"; "--yaml-file" ],
-        "The yaml configuration filename. Default: 'krama.yaml'"
+        "The yaml configuration filename. Default: './krama.yaml'"
       )
     )
 

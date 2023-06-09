@@ -33,6 +33,7 @@ module Json =
       Outputs: Output list
       FloatAsString: bool option
       DateAsFloat: bool option
+      FsProjFile: string
     }
 
 module Bare =
@@ -50,7 +51,13 @@ module Bare =
 
   type Includes = Map<FieldName, InstructionList option>
 
-  type Config = { Version: int; Includes: List<Includes> option; Excludes: List<string> option }
+  type Config =
+    {
+      Version: int
+      Includes: List<Includes> option
+      Excludes: List<string> option
+      FsProjFile: string
+    }
 
 open Legivel.Serialization
 open Legivel.Attributes
