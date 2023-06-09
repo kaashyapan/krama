@@ -29,37 +29,53 @@ let tests =
       match testname with
       | "simple" ->
         [
-          T.Alias("Test.Name", T.String)
-          T.Alias("Test.Persons", T.List(T.Userdef "Test.Name"))
+          T.Option(T.Userdef "Test.Persons")
+          T.RecordMember("allpersons", T.Option(T.Userdef "Test.Persons")) 
+          T.Record [ T.RecordMember("allpersons", T.Option(T.Userdef "Test.Persons")) ]
           T.Alias(
             "Test.Model",
             T.Record [ T.RecordMember("allpersons", T.Option(T.Userdef "Test.Persons")) ]
           )
+          T.List(T.Userdef "Test.Name")
+          T.Alias("Test.Persons", T.List(T.Userdef "Test.Name"))
+          T.Alias("Test.Name", T.String)
         ]
       | "multi_module" ->
         [
-          T.Alias("Test.Mod1.Name", T.String)
-          T.Alias("Test.Mod1.Persons", T.List(T.Userdef "Test.Mod1.Name"))
+          T.Option(T.Userdef "Test.Mod1.Persons")
+          T.RecordMember("allpersons", T.Option(T.Userdef "Test.Mod1.Persons")) 
+          T.Record [ T.RecordMember("allpersons", T.Option(T.Userdef "Test.Mod1.Persons")) ]
           T.Alias(
             "Test.Model",
             T.Record [ T.RecordMember("allpersons", T.Option(T.Userdef "Test.Mod1.Persons")) ]
           )
+          T.List(T.Userdef "Test.Mod1.Name")
+          T.Alias("Test.Mod1.Persons", T.List(T.Userdef "Test.Mod1.Name"))
+          T.Alias("Test.Mod1.Name", T.String)
         ]
       | "skip_unused" ->
         [
-          T.Alias("Test.Persons", T.List(T.String))
+          T.Option(T.Userdef "Test.Persons")
+          T.RecordMember("allpersons", T.Option(T.Userdef "Test.Persons"))
+          T.Record [ T.RecordMember("allpersons", T.Option(T.Userdef "Test.Persons")) ]
           T.Alias(
             "Test.Model",
             T.Record [ T.RecordMember("allpersons", T.Option(T.Userdef "Test.Persons")) ]
           )
+          T.List(T.String)
+          T.Alias("Test.Persons", T.List(T.String))
         ]
       | "deep_dep" ->
         [
-          T.Alias("Test.Name", T.String)
+          T.Option(T.Userdef "Test.Name")
+          T.List(T.Option(T.Userdef "Test.Name"))
+          T.RecordMember("allpersons", T.List(T.Option(T.Userdef "Test.Name")))
+          T.Record [ T.RecordMember("allpersons", T.List(T.Option(T.Userdef "Test.Name"))) ]
           T.Alias(
-            "Test.Model",
+            "Test.Model", 
             T.Record [ T.RecordMember("allpersons", T.List(T.Option(T.Userdef "Test.Name"))) ]
           )
+          T.Alias("Test.Name", T.String)
         ]
 
       | _ -> []

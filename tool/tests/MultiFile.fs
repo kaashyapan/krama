@@ -5,7 +5,7 @@ open System.IO
 open Krama.Types
 open Krama.Config
 open Krama.Compiler
-open Krama.Files
+open Krama.CodePrinter
 open Expecto
 open FSharpx
 

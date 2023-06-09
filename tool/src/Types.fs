@@ -55,24 +55,24 @@ let rec getDepTypes (acc: T list, alltypes: T List) (topType: T) : (T List * T l
   match topType with
   | T.Userdef str ->
     let dependencies = str |> getTypeHeirarchy alltypes
-    let acc' = acc @ List.rev (dependencies)
+    let acc' = acc @ dependencies
     acc', alltypes
-  | T.Option t -> getDepTypes (acc, alltypes) t
-  | T.VOption t -> getDepTypes (acc, alltypes) t
-  | T.List t -> getDepTypes (acc, alltypes) t
-  | T.Seq t -> getDepTypes (acc, alltypes) t
-  | T.Array t -> getDepTypes (acc, alltypes) t
-  | T.Set t -> getDepTypes (acc, alltypes) t
-  | T.Map tlist -> List.fold getDepTypes (acc, alltypes) tlist
-  | T.Tuple tlist -> List.fold getDepTypes (acc, alltypes) tlist
-  | T.Result tlist -> List.fold getDepTypes (acc, alltypes) tlist
-  | T.Choice tlist -> List.fold getDepTypes (acc, alltypes) tlist
-  | T.Record tlist -> List.fold getDepTypes (acc, alltypes) tlist
-  | T.Union tlist -> List.fold getDepTypes (acc, alltypes) tlist
-  | T.AnonRecord tlist -> List.fold getDepTypes (acc, alltypes) tlist
-  | T.UnionMember(_, tlist) -> List.fold getDepTypes (acc, alltypes) tlist
-  | T.RecordMember(_, t) -> getDepTypes (acc, alltypes) t
-  | T.AnonRec tlist -> tlist |> List.map (fun (_, t) -> t) |> List.fold getDepTypes (acc, alltypes)
+  | T.Option t -> getDepTypes ( topType :: acc, alltypes) t
+  | T.VOption t -> getDepTypes (topType :: acc, alltypes) t
+  | T.List t -> getDepTypes (topType :: acc, alltypes) t
+  | T.Seq t -> getDepTypes (topType :: acc, alltypes) t
+  | T.Array t -> getDepTypes (topType :: acc, alltypes) t
+  | T.Set t -> getDepTypes (topType :: acc, alltypes) t
+  | T.Map tlist -> List.fold getDepTypes (topType :: acc, alltypes) tlist
+  | T.Tuple tlist -> List.fold getDepTypes (topType :: acc, alltypes) tlist
+  | T.Result tlist -> List.fold getDepTypes (topType :: acc, alltypes) tlist
+  | T.Choice tlist -> List.fold getDepTypes (topType :: acc, alltypes) tlist
+  | T.Record tlist -> List.fold getDepTypes (topType :: acc, alltypes) tlist
+  | T.Union tlist -> List.fold getDepTypes (topType :: acc, alltypes) tlist
+  | T.AnonRecord tlist -> List.fold getDepTypes (topType :: acc, alltypes) tlist
+  | T.UnionMember(_, tlist) -> List.fold getDepTypes (topType :: acc, alltypes) tlist
+  | T.RecordMember(_, t) -> getDepTypes (topType :: acc, alltypes) t
+  | T.AnonRec tlist -> tlist |> List.map (fun (_, t) -> t) |> List.fold getDepTypes (topType :: acc, alltypes)
   | T.Alias(str, t) -> getDepTypes (acc, alltypes) t
   | _ -> (acc, alltypes)
 
@@ -87,7 +87,7 @@ let getTypeHeirarchy (alltypes: T list) (typeName: string) : T list =
   |> function
     | Some t ->
       let (dependencies, _) = t |> getDepTypes ([ t ], alltypes)
-      dependencies |> List.where (fun t -> t <> T.TypeNotSupported) |> List.rev
+      dependencies |> List.where (fun t -> t <> T.TypeNotSupported) |> List.distinct
     | None ->
       log (Log.Err $"{typeName} was not found in any file")
       [ T.TypeNotSupported ]

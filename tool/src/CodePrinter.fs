@@ -13,29 +13,20 @@ let getTypeDependencies (op: Json.Includes list) (typs: T List) =
     incls
     |> Map.keys
     |> Seq.toList
-    |> List.map (fun typeName -> typeName |> getTypeHeirarchy typs)
+    |> List.map (fun typeName -> typeName |> getTypeHeirarchy typs |> List.distinct)
     |> List.concat
   )
   |> List.concat
-  |> List.where (fun t -> t <> T.TypeNotSupported)
   |> List.distinct
-  |> List.map (fun t ->
-    match t with
-    | T.Userdef str -> str
-    | _ -> ""
-  )
-  |> List.where (not << String.IsNullOrWhiteSpace)
 
-let mkjsonTemplate (config: Json.Config) (typs: T List) (typesToPrint: string list) =
+let mkjsonTemplate (config: Json.Config) (typs: T List) (typesToPrint: T list) =
   typs
   |> List.fold
     (fun acc t ->
-      match t with
-      | T.Userdef str ->
-        if (List.contains str typesToPrint) then List.append acc [ (t.ToString()) ] else acc
-      | _ -> acc
-    )
-    []
+        if List.contains t typesToPrint then
+          t.ToString() :: acc
+        else acc
+    ) []
   |> String.concat "\n"
 
 let writeFile (opFileName: string) (byts) = File.WriteAllText(opFileName, byts)
@@ -43,8 +34,10 @@ let writeFile (opFileName: string) (byts) = File.WriteAllText(opFileName, byts)
 let writeJson (projectRoot: DirectoryInfo) (config: Json.Config) (typs: T List) =
   config.Outputs
   |> List.map (fun op ->
+    printfn "op- %A" op
     let typesToPrint = getTypeDependencies op.Includes typs
     let stringToPrint = mkjsonTemplate config typs typesToPrint
+    printfn "stringtoprint - %A" stringToPrint
     let fileToPrint = sprintf "%s/%s" projectRoot.FullName op.File
     writeFile fileToPrint stringToPrint
   )
