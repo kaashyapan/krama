@@ -1,5 +1,5 @@
 Version: 1
-Strategy: Json
+Serializer: Json
 Case: Camel #Key case strategy
 FloatAsString: false # Decimal, single & double types will be encoded as Json strings
 DateAsFloat: false # DateTime formats as floats

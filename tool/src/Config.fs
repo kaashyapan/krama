@@ -62,7 +62,7 @@ module Bare =
 open Legivel.Serialization
 open Legivel.Attributes
 
-[<YamlField("Strategy")>]
+[<YamlField("Serializer")>]
 type Config =
   | Json of Json.Config
   | Bare of Bare.Config

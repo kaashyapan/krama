@@ -31,7 +31,7 @@ let tryLoadConfig (yamlFile: IO.FileInfo) =
 /// Validate config file and map to internal datastructures.
 let getConfig (args: Args) =
 
-  log (Log.Info $"Loading config {args.YamlFile}")
+  log (Log.Info $"Inspecting configuration {args.YamlFile}")
 
   match tryLoadConfig (args.YamlFile) with
   | Valid cfg -> Ok cfg
@@ -76,9 +76,6 @@ let getProjFile (config: Config) =
   )
 
 let loadProj (yamlFile: IO.FileInfo option) =
-  let config = yamlFile |> processOptions
-  let projfile = Result.map getProjFile config
-
   yamlFile
   |> processOptions
   |> Result.map (fun config ->

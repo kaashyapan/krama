@@ -191,6 +191,7 @@ let rec getType (t: FSharpEntity) : T seq =
   | _ -> T.TypeNotSupported |> Seq.singleton
 
 let parseAndTypeCheck (ionide: Ionide.ProjInfo.Types.ProjectOptions) =
+  log (Log.Info "Typechecking your project ..")
   let projOptions =
     {
       FSharpProjectOptions.IsIncompleteTypeCheckEnvironment = false
@@ -241,5 +242,6 @@ let parseAndTypeCheck (ionide: Ionide.ProjInfo.Types.ProjectOptions) =
 let processFsFiles (fsProjFile: FileInfo) : Types.T list =
   let toolsPath = Init.init fsProjFile.Directory None
   let loader: IWorkspaceLoader = WorkspaceLoader.Create(toolsPath, [])
+  log (Log.Info "Project cracking ..")
   let projectOptions = loader.LoadProjects([ fsProjFile.FullName ]) |> Seq.toArray |> Array.head
   parseAndTypeCheck projectOptions

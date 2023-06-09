@@ -27,12 +27,14 @@ let mkjsonTemplate (config: Json.Config) (typs: T List) (typesToPrint: T list) =
 let writeFile (opFileName: string) (byts) = File.WriteAllText(opFileName, byts)
 
 let writeJson (config: Json.Config) (typs: T List) =
+  log (Log.Info "Loading JSON serializer.. ")
   config.Outputs
   |> List.map (fun op ->
-    printfn "op- %A" op
+
+    log (Log.Info $"Looking up types that need printing to {op.File} ..")
     let typesToPrint = getTypeDependencies op.Includes typs
     let stringToPrint = mkjsonTemplate config typs typesToPrint
-    printfn "stringtoprint - %A" stringToPrint
+    log (Log.Info $"Printing {op.File} ..")
     writeFile op.File stringToPrint
   )
   |> ignore
