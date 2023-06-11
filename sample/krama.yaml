@@ -1,0 +1,9 @@
+Version: 1
+Serializer: Json
+FsProjFile: "./Sample.fsproj"
+Outputs:
+  - File: generates.json.fs
+    Namespace: KitchensinkJson
+    # Map of top level types that need to be serialized
+    Includes:
+      - Kitchensink.Payload: # Full path of the type Namespace.Module.TypeName

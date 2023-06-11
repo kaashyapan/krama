@@ -16,7 +16,11 @@
 		<Compile Include="Types.fs" />
 		<Compile Include="Config.fs" />
 		<Compile Include="Compiler.fs" />
-		<Compile Include="CodePrinter.fs" />
+		<Compile Include="json/Encoders.fs" />
+		<Compile Include="json/Decoders.fs" />
+		<Compile Include="json/TypeAug.fs" />
+		<Compile Include="json/Codeprinter.fs" />
+		<Compile Include="CodePrinter.Bare.fs" />
 		<Compile Include="Console.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>
@@ -30,7 +34,11 @@
     <PackageReference Include="Microsoft.Build.Framework" Version="17.5.0" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="NuGet.Frameworks" Version="6.5.0" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="Ionide.ProjInfo" Version="0.61.3" />
-    <PackageReference Include="Fantomas.Core" Version="6.0.3" />
+    <PackageReference Include="CaseExtensions" Version="1.1.0" />
 	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="/home/ubuntu/Fabulous.AST/src/Fabulous.AST/Fabulous.AST.fsproj" />
+  </ItemGroup>
 
 </Project>

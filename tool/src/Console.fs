@@ -5,7 +5,6 @@ open System.IO
 open Krama.Config
 open Krama.Log
 open Krama.Compiler
-open Krama.CodePrinter
 
 type Args = { YamlFile: IO.FileInfo; Version: string }
 
@@ -86,8 +85,8 @@ let loadProj (yamlFile: IO.FileInfo option) =
       let types = processFsFiles fsProjFile
 
       match config with
-      | Json jsonConfig -> writeJson jsonConfig types
-      | Bare bareConfig -> writeBare bareConfig types
+      | Json jsonConfig -> Krama.CodePrinter.Json.writeJson jsonConfig types
+      | Bare bareConfig -> Krama.CodePrinter.Bare.writeBare bareConfig types
 
       log (Log.Msg "Serializers have been generated")
     )

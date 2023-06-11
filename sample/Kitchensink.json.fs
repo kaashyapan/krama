@@ -112,7 +112,7 @@ type Decoders() =
     [<Extension>]
     static member AsPayload(j: JsonNode) : Payload =
         {
-            Name = (j </> "Name").AsString()
+            Name = j.Get("Name").AsString() 
             Age = (j </> "Age").AsInt()
             Address = (j?Address).AsAddressOrNone()
             Sex = (j </> "Sex").AsSex()
@@ -130,10 +130,8 @@ type Decoders() =
         | _ -> failwith "Unexpected value"
 
     [<Extension>]
-    static member AsPayloadOrNone(j: JsonNode option) : Payload option =
-        match j with
-        | Some node -> node.AsPayloadOrNone()
-        | None -> None
+    static member AsPayloadOrNone(jnode: JsonNode option) : Payload option =
+        jnode |> Option.bind (fun node -> node.AsPayloadOrNone()) 
 
 type Payload with
       static member toJson(p: Payload) : string =

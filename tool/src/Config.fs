@@ -51,13 +51,16 @@ module Bare =
 
   type Includes = Map<FieldName, InstructionList option>
 
-  type Config =
+  type Output =
     {
-      Version: int
-      Includes: List<Includes> option
+      File: string
+      Namespace: string option
+      Module: string option
+      Includes: List<Includes>
       Excludes: List<string> option
-      FsProjFile: string
     }
+
+  type Config = { Version: int; Outputs: Output list; FsProjFile: string }
 
 open Legivel.Serialization
 open Legivel.Attributes

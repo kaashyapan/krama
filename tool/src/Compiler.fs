@@ -192,6 +192,7 @@ let rec getType (t: FSharpEntity) : T seq =
 
 let parseAndTypeCheck (ionide: Ionide.ProjInfo.Types.ProjectOptions) =
   log (Log.Info "Typechecking your project ..")
+
   let projOptions =
     {
       FSharpProjectOptions.IsIncompleteTypeCheckEnvironment = false

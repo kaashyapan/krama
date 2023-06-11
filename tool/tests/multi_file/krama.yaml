@@ -6,8 +6,8 @@ FloatAsString: false # Decimal, single & double types will be encoded as Json st
 DateAsFloat: false # DateTime formats as floats
 Outputs:
   - File: generates.json.fs
-    Namespace: Hello
-    Module: World
+    Namespace: Foo
+    Module: Bar
     # Map of top level types that need to be serialized
     Includes:
       - Model.Person: # Full path of the type Namespace.Module.TypeName
