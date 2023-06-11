@@ -44,6 +44,7 @@ type T =
   | RecordMember of string * T
   | Record of T list
   | AnonRecord of T list
+  | UnionSimple of T list
   | Union of T list
   | UnionMember of string * T list
   | Choice of T list

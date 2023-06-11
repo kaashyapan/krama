@@ -167,8 +167,7 @@ let rec getType (t: FSharpEntity) : T seq =
 
   | t when t.IsFSharpUnion ->
     let accessPath = String.concat "." [ t.AccessPath; t.DisplayName ]
-
-    let typ =
+    let members =
       t.UnionCases
       |> Seq.map (fun field ->
         let payloads =
@@ -176,13 +175,25 @@ let rec getType (t: FSharpEntity) : T seq =
           |> Seq.map (fun f -> [ f.FieldType ] |> makeGenericArguments |> List.head)
           |> Seq.toList
 
-        (field.Name, payloads) |> T.UnionMember
-
+        let unionMemberTyp = (field.Name, payloads) |> T.UnionMember
+        (unionMemberTyp, List.length payloads)
       )
       |> Seq.toList
-      |> T.Union
+
+    let payloadCount =
+      members
+      |> List.map (fun (_, payloadCount)-> payloadCount)
+      |> List.sum
+
+    let members' = members |> List.map (fun (umems, _)-> umems) 
+    let typ =
+      if payloadCount > 0 then 
+         T.Union members'
+      else
+         T.UnionSimple members'
 
     (accessPath, typ) |> T.Alias |> Seq.singleton
+
 
   | t when t.IsFSharpModule ->
 
