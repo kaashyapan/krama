@@ -24,12 +24,19 @@ let makeGenericArguments (tlist: FSharpType seq) =
     //Accesspath will not be available for anonrecords
     if field.IsAnonRecordType then
       makeType field.AbbreviatedType
-    else if List.contains field.TypeDefinition.AccessPath sharpNamespaces then
+    else if field.IsTupleType then
       makeType field.AbbreviatedType
-    else
+    else if
+      field.HasTypeDefinition
+      && List.contains field.TypeDefinition.AccessPath sharpNamespaces
+    then
+      makeType field.AbbreviatedType
+    else if field.HasTypeDefinition then
       [ field.TypeDefinition.AccessPath; field.TypeDefinition.DisplayName ]
       |> String.concat "."
       |> T.Userdef
+    else
+      failwith (sprintf "Type not handled %A" field.ToString)
 
   )
   |> Seq.toList
@@ -39,7 +46,7 @@ let rec makeType (t: FSharpType) : T =
   match t with
   | t when t.IsAnonRecordType ->
     t.GenericArguments
-    |> Seq.allPairs t.AnonRecordTypeDetails.SortedFieldNames
+    |> Seq.zip t.AnonRecordTypeDetails.SortedFieldNames
     |> Seq.map (fun (name, field) ->
       let f = [ field ] |> makeGenericArguments |> List.head
       T.RecordMember(name, f)
@@ -47,7 +54,13 @@ let rec makeType (t: FSharpType) : T =
     |> Seq.toList
     |> T.AnonRecord
 
-  | _ ->
+  | t when t.IsTupleType ->
+    t.GenericArguments
+    |> Seq.map (fun field -> [ field ] |> makeGenericArguments |> List.head)
+    |> Seq.toList
+    |> T.Tuple
+
+  | t when t.HasTypeDefinition ->
     match t.TypeDefinition.AccessPath with
     | "Microsoft.FSharp.Core" ->
       match String.toLower t.TypeDefinition.DisplayName with
@@ -167,6 +180,7 @@ let rec getType (t: FSharpEntity) : T seq =
 
   | t when t.IsFSharpUnion ->
     let accessPath = String.concat "." [ t.AccessPath; t.DisplayName ]
+
     let members =
       t.UnionCases
       |> Seq.map (fun field ->
@@ -180,20 +194,12 @@ let rec getType (t: FSharpEntity) : T seq =
       )
       |> Seq.toList
 
-    let payloadCount =
-      members
-      |> List.map (fun (_, payloadCount)-> payloadCount)
-      |> List.sum
+    let payloadCount = members |> List.map (fun (_, payloadCount) -> payloadCount) |> List.sum
 
-    let members' = members |> List.map (fun (umems, _)-> umems) 
-    let typ =
-      if payloadCount > 0 then 
-         T.Union members'
-      else
-         T.UnionSimple members'
+    let members' = members |> List.map (fun (umems, _) -> umems)
+    let typ = if payloadCount > 0 then T.Union members' else T.UnionSimple members'
 
     (accessPath, typ) |> T.Alias |> Seq.singleton
-
 
   | t when t.IsFSharpModule ->
 
@@ -206,7 +212,7 @@ let parseAndTypeCheck (ionide: Ionide.ProjInfo.Types.ProjectOptions) =
 
   let projOptions =
     {
-      FSharpProjectOptions.IsIncompleteTypeCheckEnvironment = false
+      FSharpProjectOptions.IsIncompleteTypeCheckEnvironment = true
       LoadTime = ionide.LoadTime
       OriginalLoadReferences = []
       OtherOptions = ionide.OtherOptions |> List.toArray

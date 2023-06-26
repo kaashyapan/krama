@@ -6,7 +6,7 @@ open Kitchensink
 open KitchensinkJson
 
 let GetStreet (j: JsonNode) : string = j.Get("Address").Get("Street").AsString()
-let GetPayloadMaybeNull (j: JsonNode) : Payload option = j.AsPayloadOrNone() 
+let GetPayloadMaybeNull (j: JsonNode) : Payload option = j.AsPayloadOrNone()
 
 [<EntryPoint>]
 let main argv =

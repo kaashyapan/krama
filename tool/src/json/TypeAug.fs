@@ -12,8 +12,12 @@ open Fantomas.FCS.Text
 open FSharpx
 open CaseExtensions
 
-let serializeStmt (objName: string) =
+let serializeStmt (typeAccessPath: string) =
+  let objName = typeAccessPath.Split(".") |> Array.rev |> Array.head
   let objNameLower = objName.ToCamelCase()
+
+  let parameters =
+    [ PatternWithCurriedParameters([ (objNameLower, Some(CommonType.mkType (typeAccessPath))) ]) ]
 
   Expr.CompExprBody(
     ExprCompExprBodyNode(
@@ -34,7 +38,7 @@ let serializeStmt (objName: string) =
                 )
               ),
               None,
-              List.Empty,
+              parameters,
               None,
               SingleTextNode("=", Range.Zero),
               Expr.Constant(
@@ -76,15 +80,20 @@ let typeMethods
       let objName = typeAccessPath.Split(".") |> Array.rev |> Array.head
       let objNameLower = objName.ToCamelCase()
 
+      let toJsonPattern =
+        PatternWithCurriedParameters([ (objNameLower, Some(CommonType.mkType (typeAccessPath))) ])
+
+      let fromJsonPattern = PatternWithCurriedParameters([ ("jsonstr", Some(CommonType.String)) ])
+
       let clas =
         Augment(typeAccessPath, []) {
-          (Method("toJson", [| $"({objNameLower}: {typeAccessPath})" |]) {
-            EscapeHatch(serializeStmt objName)
+          (StaticMethodMember("ToJson", [ toJsonPattern ]) {
+            EscapeHatch(serializeStmt typeAccessPath)
           })
-            .isStatic ()
+            .returnType (CommonType.String)
 
-          (Method("fromJson", [| "(jsonstr: string)" |]) { EscapeHatch(parseStmt objName) })
-            .isStatic ()
+          (StaticMethodMember("FromJson", [ fromJsonPattern ]) { EscapeHatch(parseStmt objName) })
+            .returnType (CommonType.mkType (typeAccessPath))
         }
 
       clas

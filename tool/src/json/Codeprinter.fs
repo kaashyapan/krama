@@ -29,6 +29,9 @@ let mkjsonTemplate
   (typesToPrint: T list)
   =
 
+  let (generatedTypes, generatedMembers, members) =
+    Krama.Json.Encoder.encoders jsonOuts config typs typesToPrint
+
   match jsonOuts.Namespace with
   | Some ns ->
     match jsonOuts.Module with
@@ -40,8 +43,18 @@ let mkjsonTemplate
         Open "Krama.Json"
 
         NestedModule(module_) {
-          Krama.Json.Encoders.encoders jsonOuts config typs typesToPrint
-          Krama.Json.Decoders.decoders jsonOuts config typs typesToPrint
+          for m in generatedTypes do
+            m
+
+          Class("Encoders") {
+            for m in generatedMembers do
+              m
+
+            for m in members do
+              m
+          }
+
+          Krama.Json.Decoder.decoders jsonOuts config typs typesToPrint
 
           for widget in (Krama.Json.Ast.TypeAug.typeMethods jsonOuts config typs typesToPrint) do
             widget
@@ -57,8 +70,19 @@ let mkjsonTemplate
         Open "System"
         Open "System.Runtime.CompilerServices"
         Open "Krama.Json"
-        Krama.Json.Encoders.encoders jsonOuts config typs typesToPrint
-        Krama.Json.Decoders.decoders jsonOuts config typs typesToPrint
+
+        for m in generatedTypes do
+          m
+
+        Class("Encoders") {
+          for m in generatedMembers do
+            m
+
+          for m in members do
+            m
+        }
+
+        Krama.Json.Decoder.decoders jsonOuts config typs typesToPrint
 
         for widget in (Krama.Json.Ast.TypeAug.typeMethods jsonOuts config typs typesToPrint) do
           widget
@@ -75,8 +99,19 @@ let mkjsonTemplate
         Open "System"
         Open "System.Runtime.CompilerServices"
         Open "Krama.Json"
-        Krama.Json.Encoders.encoders jsonOuts config typs typesToPrint
-        Krama.Json.Decoders.decoders jsonOuts config typs typesToPrint
+
+        for m in generatedTypes do
+          m
+
+        Class("Encoders") {
+          for m in generatedMembers do
+            m
+
+          for m in members do
+            m
+        }
+
+        Krama.Json.Decoder.decoders jsonOuts config typs typesToPrint
 
         for widget in (Krama.Json.Ast.TypeAug.typeMethods jsonOuts config typs typesToPrint) do
           widget

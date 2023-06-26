@@ -12,10 +12,27 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="fabulous_ast/Augment.fs" />
+		<Compile Include="Common.fs" />
 		<Compile Include="Log.fs" />
 		<Compile Include="Types.fs" />
 		<Compile Include="Config.fs" />
 		<Compile Include="Compiler.fs" />
+		<Compile Include="json/encoders/Store.fs" />
+		<Compile Include="json/encoders/Choice.fs" />
+		<Compile Include="json/encoders/Tuple.fs" />
+		<Compile Include="json/encoders/List.fs" />
+		<Compile Include="json/encoders/AnonRecord.fs" />
+		<Compile Include="json/encoders/Simpleunion.fs" />
+		<Compile Include="json/encoders/Union.fs" />
+		<Compile Include="json/encoders/Record.fs" />
+		<Compile Include="json/decoders/Choice.fs" />
+		<Compile Include="json/decoders/Tuple.fs" />
+		<Compile Include="json/decoders/List.fs" />
+		<Compile Include="json/decoders/AnonRecord.fs" />
+		<Compile Include="json/decoders/Simpleunion.fs" />
+		<Compile Include="json/decoders/Union.fs" />
+		<Compile Include="json/decoders/Record.fs" />
 		<Compile Include="json/Encoders.fs" />
 		<Compile Include="json/Decoders.fs" />
 		<Compile Include="json/TypeAug.fs" />

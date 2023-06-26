@@ -8,19 +8,14 @@ open Expecto
 open FSharpx
 
 let tests =
-  Directory.EnumerateDirectories("./heirarchy") 
+  Directory.EnumerateDirectories("./heirarchy")
   |> Seq.where (fun x -> not <| String.contains @"/." x)
   //|> Seq.where (fun x -> String.contains @"multi" x)
   //|> (fun x -> printfn "%A" x ; x)
   |> Seq.map (fun dir -> sprintf "%s/%s" dir "test.fsproj")
   |> Seq.toList
-  |> List.map (fun projfile  ->
-    let testname =
-      projfile
-      |> String.splitChar [| '/' |]
-      |> Array.rev
-      |> Array.tail
-      |> Array.head
+  |> List.map (fun projfile ->
+    let testname = projfile |> String.splitChar [| '/' |] |> Array.rev |> Array.tail |> Array.head
 
     let types = Krama.Compiler.processFsFiles <| FileInfo(projfile)
     let actual = Krama.Types.getTypeHeirarchy types "Test.Model"
@@ -30,7 +25,7 @@ let tests =
       | "simple" ->
         [
           T.Option(T.Userdef "Test.Persons")
-          T.RecordMember("allpersons", T.Option(T.Userdef "Test.Persons")) 
+          T.RecordMember("allpersons", T.Option(T.Userdef "Test.Persons"))
           T.Record [ T.RecordMember("allpersons", T.Option(T.Userdef "Test.Persons")) ]
           T.Alias(
             "Test.Model",
@@ -43,7 +38,7 @@ let tests =
       | "multi_module" ->
         [
           T.Option(T.Userdef "Test.Mod1.Persons")
-          T.RecordMember("allpersons", T.Option(T.Userdef "Test.Mod1.Persons")) 
+          T.RecordMember("allpersons", T.Option(T.Userdef "Test.Mod1.Persons"))
           T.Record [ T.RecordMember("allpersons", T.Option(T.Userdef "Test.Mod1.Persons")) ]
           T.Alias(
             "Test.Model",
@@ -72,7 +67,7 @@ let tests =
           T.RecordMember("allpersons", T.List(T.Option(T.Userdef "Test.Name")))
           T.Record [ T.RecordMember("allpersons", T.List(T.Option(T.Userdef "Test.Name"))) ]
           T.Alias(
-            "Test.Model", 
+            "Test.Model",
             T.Record [ T.RecordMember("allpersons", T.List(T.Option(T.Userdef "Test.Name"))) ]
           )
           T.Alias("Test.Name", T.String)

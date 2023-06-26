@@ -1,7 +1,7 @@
 module rec Krama.Types
 
 open Krama.Log
-open FSharpx
+open Krama.Common
 
 [<RequireQualifiedAccess>]
 type T =
@@ -22,14 +22,14 @@ type T =
   | Double
   | Guid
   | Bool
+  | Decimal
+  | Byte
+  | SByte
   | DateTime
   | DateOnly
   | TimeSpan
   | TimeOnly
   | DateTimeOffset
-  | Decimal
-  | Byte
-  | SByte
   | Option of T
   | VOption of T
   | Tuple of T list
@@ -40,7 +40,7 @@ type T =
   | Set of T
   | Alias of string * T //Access path * type
   | Userdef of string
-  | AnonRec of (string * T) list
+  //| AnonRec of (string * T) list
   | RecordMember of string * T
   | Record of T list
   | AnonRecord of T list
@@ -73,10 +73,12 @@ let rec getDepTypes (acc: T list, alltypes: T List) (topType: T) : (T List * T l
   | T.AnonRecord tlist -> List.fold getDepTypes (topType :: acc, alltypes) tlist
   | T.UnionMember(_, tlist) -> List.fold getDepTypes (topType :: acc, alltypes) tlist
   | T.RecordMember(_, t) -> getDepTypes (topType :: acc, alltypes) t
+  (**
   | T.AnonRec tlist ->
     tlist
     |> List.map (fun (_, t) -> t)
     |> List.fold getDepTypes (topType :: acc, alltypes)
+  *)
   | T.Alias(str, t) -> getDepTypes (acc, alltypes) t
   | _ -> (acc, alltypes)
 
@@ -95,3 +97,59 @@ let getTypeHeirarchy (alltypes: T list) (typeName: string) : T list =
     | None ->
       log (Log.Err $"{typeName} was not found in any file")
       [ T.TypeNotSupported ]
+
+let rec stringifyType (t: T) =
+  match t with
+  | T.Char -> "char"
+  | T.String -> "string"
+  | T.Int8 -> "int8"
+  | T.Int16 -> "int16"
+  | T.Int32 -> "int32"
+  | T.Int64 -> "int64"
+  | T.Int128 -> "int128"
+  | T.UInt8 -> "uint8"
+  | T.UInt16 -> "uint16"
+  | T.UInt32 -> "uint32"
+  | T.UInt64 -> "uint64"
+  | T.UInt128 -> "uint128"
+  | T.Half -> "half"
+  | T.Single -> "single"
+  | T.Double -> "double"
+  | T.Guid -> "System.Guid"
+  | T.Bool -> "bool"
+  | T.Decimal -> "System.Decimal"
+  | T.Byte -> "byte"
+  | T.SByte -> "sbyte"
+  | T.DateTime -> "System.DateTime"
+  | T.DateOnly -> "System.DateOnly"
+  | T.TimeSpan -> "System.TimeSpan"
+  | T.TimeOnly -> "System.TimeOnly"
+  | T.DateTimeOffset -> "System.DateTimeOffset"
+  | T.Option t -> (stringifyType t) + " option"
+  | T.VOption t -> (stringifyType t) + " voption"
+  | T.Tuple tlist -> tlist |> List.map stringifyType |> String.join " * "
+  | T.Map tlist -> ""
+  | T.List t -> (stringifyType t) + " list"
+  | T.Array t -> (stringifyType t) + " array"
+  | T.Seq t -> (stringifyType t) + " seq"
+  | T.Set t -> (stringifyType t) + " set"
+  | T.Alias(name, typ) -> name
+  | T.Userdef name -> name
+  | T.RecordMember(name, typ) -> $"{name}: " + stringifyType typ
+  | T.Record tlist ->
+    let members = tlist |> List.map stringifyType |> String.join " ; "
+    "{ " + members + " }"
+  | T.AnonRecord tlist ->
+    let members = tlist |> List.map stringifyType |> String.join " ; "
+    "{| " + members + " |}"
+  | T.UnionSimple tlist -> ""
+  | T.Union tlist -> ""
+  | T.UnionMember(name, tlist) -> ""
+  | T.Choice tlist ->
+    let members = tlist |> List.map stringifyType |> String.join ", "
+    "Choice<" + members + ">"
+  | T.Result tlist ->
+    let members = tlist |> List.map stringifyType |> String.join ", "
+    "Result<" + members + ">"
+  | T.Exception -> "exn"
+  | T.TypeNotSupported -> "NotSupported"

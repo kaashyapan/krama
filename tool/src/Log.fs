@@ -13,9 +13,15 @@ type A private () =
 
   member this.Action(logType: Log) =
     match logType with
-    | Log.Err err -> AnsiConsole.MarkupLine($"[red]-[/] {err}")
-    | Log.Msg msg -> AnsiConsole.MarkupLine($"[green]-[/] {msg}")
-    | Log.Info info -> AnsiConsole.MarkupLine($"[blue]-[/] {info}")
+    | Log.Err err ->
+      AnsiConsole.Foreground <- Color.Red
+      AnsiConsole.MarkupLine(err)
+    | Log.Msg msg ->
+      AnsiConsole.Foreground <- Color.Green
+      AnsiConsole.MarkupLine(msg)
+    | Log.Info info ->
+      AnsiConsole.Foreground <- Color.Blue
+      AnsiConsole.MarkupLine(info)
 
 let log (logtype: Log) =
   let a = A.Instance

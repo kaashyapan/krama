@@ -5,7 +5,16 @@ open System.Runtime.CompilerServices
 open Krama.Json
 open Kitchensink
 
-type Encoders() =
+type AnonRecordOfInt32StringInt32String = {| name: string |}
+type ListOfString = string list
+type TupleOfStringStringInt32 = string * string * int32
+
+type Encoders =
+    static member encode(p: Address option) : JsonNode =
+        match p with
+        | Some address -> Encoders.encode address
+        | None -> JsonNode.encode ()
+
     static member encode(p: Address) : JsonNode =
         seq {
             ("Street", JsonNode.encode p.Street)
@@ -13,9 +22,9 @@ type Encoders() =
         }
         |> JsonNode.encode
 
-    static member encode(p: Address option) : JsonNode =
-        match p with
-        | Some address -> Encoders.encode address
+    static member encode(value: Pet option) : JsonNode =
+        match value with
+        | Some pet -> Encoders.encode pet
         | None -> JsonNode.encode ()
 
     static member encode(value: Pet) : JsonNode =
@@ -24,16 +33,18 @@ type Encoders() =
         | Dog -> "Dog"
         |> JsonNode.encode
 
-    static member encode(value: Pet option) : JsonNode =
+    static member encode (value: Kitchensink.Age) : JsonNode = JsonNode.encode value
+
+    static member encode (value: Kitchensink.Age option) : JsonNode =
         match value with
-        | Some pet -> Encoders.encode pet
+        | Some age -> Encoders.encode age
         | None -> JsonNode.encode ()
 
     static member encode(value: Sex) : JsonNode =
-        match value with
-        | Male -> "Male"
-        | Female -> "Female"
-        |> JsonNode.encode
+            seq {
+                ("Female", JsonNode.encode ())
+            }
+            |> JsonNode.encode
 
     static member encode(value: Sex option) : JsonNode =
         match value with
@@ -53,14 +64,12 @@ type Encoders() =
             ("Sex", Encoders.encode p.Sex)
             ("Pet", Encoders.encode p.Pet)
             ("Cht", Encoders.encode p.Cht)
+            ("Books", p.Books |> Seq.map JsonNode.encode |> JsonNode.encode)
         }
         |> JsonNode.encode
 
 [<Extension>]
-type Decoders() =
-    [<Extension>]
-    static member AsAddress(j: JsonNode) = { Street = (j </> "Street").AsString(); State' = (j </> "State").AsString() }
-
+type Decoders =
     [<Extension>]
     static member AsAddressOrNone(jnode: JsonNode) = jnode.AsAddress() |> Some
 
@@ -71,10 +80,15 @@ type Decoders() =
         | None -> None
 
     [<Extension>]
+    static member AsAddress(j: JsonNode) = { Street = j.Get("Street").AsString(); State' = j.Get("State").AsString() }
+
+    [<Extension>]
     static member AsSex(j: JsonNode) =
-        match (j.AsString()) with
-        | "Male" -> Male
-        | "Female" -> Female
+        match j.Value with
+        | JObject [| record |] -> 
+            match record with
+            | ("Female", _) -> Female
+            | err -> failwith "Invalid value as Sex. Received {err}"
         | err -> failwith "Invalid value as Sex. Received {err}"
 
     [<Extension>]
@@ -87,13 +101,6 @@ type Decoders() =
         | None -> None
 
     [<Extension>]
-    static member AsPet(j: JsonNode) =
-        match (j.AsString()) with
-        | "Cat" -> Cat
-        | "Dog" -> Dog
-        | err -> failwith "Invalid value as Pet. Received {err}"
-
-    [<Extension>]
     static member AsPetOrNone(j: JsonNode) = j.AsPet() |> Some
 
     [<Extension>]
@@ -103,6 +110,13 @@ type Decoders() =
         | None -> None
 
     [<Extension>]
+    static member AsPet(j: JsonNode) =
+        match (j.AsString()) with
+        | "Cat" -> Cat
+        | "Dog" -> Dog
+        | err -> failwith "Invalid value as Pet. Received {err}"
+
+    [<Extension>]
     static member AsCht(j: JsonNode) =
         match j.typ with
         | JBool v -> Choice1Of2 v
@@ -110,32 +124,42 @@ type Decoders() =
         | _ -> failwith "Unexpected value"
 
     [<Extension>]
+    static member AsListOfString(j: JsonNode) =
+        match j.typ with
+        | JArray v -> v |> Seq.map (fun v -> v.AsString()) |> Seq.toList
+        | _ -> failwith "Unexpected value"
+
+    [<Extension>]
     static member AsPayload(j: JsonNode) : Payload =
         {
-            Name = j.Get("Name").AsString() 
-            Age = (j </> "Age").AsInt()
-            Address = (j?Address).AsAddressOrNone()
-            Sex = (j </> "Sex").AsSex()
-            Pet = (j </> "Pet").AsPetOrNone()
-            Cht = (j </> "Cht").AsCht()
+            Kitchensink.Payload.Name = j.Get("Name").AsString()
+            Kitchensink.Payload.Age = (j </> "Age").AsInt32()
+            Kitchensink.Payload.Address = (j?Address).AsAddressOrNone()
+            Kitchensink.Payload.Books = (j </> "Books").AsListOfString()
+            Kitchensink.Payload.Bills = ("", "", 0)
+            Kitchensink.Payload.Sex = (j </> "Sex").AsSex()
+            Kitchensink.Payload.Pet = (j </> "Pet").AsPetOrNone()
+            Kitchensink.Payload.Cht = (j </> "Cht").AsCht()
         }
 
     [<Extension>]
-    static member AsPayloadOrNone(j: JsonNode) : Payload option = 
+    static member AsPayloadOrNone(j: JsonNode) : Payload option =
         printfn "%A" j
+
         match j.typ with
-        | JObject [||] -> None 
-        | JObject _ -> j.AsPayload() |> Some 
-        | JNull -> None 
+        | JObject [||] -> None
+        | JObject _ -> j.AsPayload() |> Some
+        | JNull -> None
         | _ -> failwith "Unexpected value"
 
     [<Extension>]
     static member AsPayloadOrNone(jnode: JsonNode option) : Payload option =
-        jnode |> Option.bind (fun node -> node.AsPayloadOrNone()) 
+        jnode |> Option.bind (fun node -> node.AsPayloadOrNone())
 
 type Payload with
-      static member toJson(p: Payload) : string =
+
+    static member toJson(p: Payload) : string =
         let encoder (p: Payload) = Encoders.encode p
         Json.serialize encoder p
 
-      static member ofJson(jstr) : Payload = Json.parse Decoders.AsPayload jstr
+    static member ofJson(jstr) : Payload = Json.parse Decoders.AsPayload jstr
