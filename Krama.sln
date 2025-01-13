@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Jean", "json\Jean.fsproj", "{4C4A2B02-686A-4030-802A-B95C640453C9}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Krama", "json\src\Krama.Json.fsproj", "{4C4A2B02-686A-4030-802A-B95C640453C9}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "JeanTests", "tests\JeanTests.fsproj", "{69EC09A9-35A6-4F5D-BE33-1D58ADC15484}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "KramaTests", "json\tests\KramaTests.fsproj", "{69EC09A9-35A6-4F5D-BE33-1D58ADC15484}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "JeanBenchmarks", "benchmarks\JeanBenchmarks.fsproj", "{C60F01FC-4395-4863-9EFD-629BB003CCF1}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "KramaBenchmarks", "benchmarks\KramaBenchmarks.fsproj", "{C60F01FC-4395-4863-9EFD-629BB003CCF1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fable", "fable", "{F37D9CF8-9715-4104-9233-7A51238F35BB}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "JeanTest", "fable\js\JeanTest.fsproj", "{0608F910-12B1-401E-BA7A-B0F2C8A886C1}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "KramaTest", "fable\js\KramaTest.fsproj", "{0608F910-12B1-401E-BA7A-B0F2C8A886C1}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Sample", "sample\Sample.fsproj", "{D025025B-4BFB-4B1D-8A09-ADBA92A341B2}"
 EndProject

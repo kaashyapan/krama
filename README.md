@@ -1,6 +1,8 @@
-# Jean - JSON library for F#
+<img src="./ganapati.png" alt="Ganapati" width="100"/>
+
+# Krama - JSON library for F#
 #### With code generation (TODO). Fable friendly.
-[nuget](https://www.nuget.org/packages/Jean)
+[nuget](https://www.nuget.org/packages/Krama.Json)
 
 This library was inspired by [Jay](https://github.com/pimbrouwers/Jay) which is in turn inspired by [FSharp.Data](https://github.com/fsprojects/FSharp.Data/blob/main/src/Json/JsonDocument.fs).
 Also inspired by [Thoth](https://github.com/thoth-org/Thoth.Json) which is probably inspired by [Elm.Json](https://package.elm-lang.org/packages/elm/json/latest/)
@@ -14,7 +16,7 @@ Also inspired by [Thoth](https://github.com/thoth-org/Thoth.Json) which is proba
 ### Usage 
 See `sample/Kitchensink.fs` & `sample/Kitchensink.json.fs`
 ```fsharp
-open Jean
+open Krama
 
 type Payload =
     { Name: string

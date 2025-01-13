@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 <PropertyGroup>
-    <Targetframework>net7.0</Targetframework>
+    <Targetframework>net8.0</Targetframework>
 </PropertyGroup>
 
 <PropertyGroup>
@@ -20,7 +20,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Targetframework>net7.0</Targetframework>
+    <Targetframework>net8.0</Targetframework>
     <NoWarn>3535,3536</NoWarn>
   <!-- NuGet config -->
   <PackageId>Krama.Json</PackageId>
@@ -39,9 +39,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../LICENSE" Pack="true" PackagePath="" />
-    <None Include="../README.md" Pack="true" PackagePath="" />
-    <None Include="../RELEASE_NOTES.md" Pack="true" PackagePath="" />
+    <None Include="../../LICENSE" Pack="true" PackagePath="" />
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <None Include="../../RELEASE_NOTES.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <Targetframework>net7.0</Targetframework>
+    <Targetframework>net8.0</Targetframework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,7 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Krama.Json.dll">
-      <HintPath>~/krama/json/src/bin/Release/net7.0/Krama.Json.dll</HintPath>
+      <HintPath>~/krama/json/src/bin/Release/net8.0/Krama.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
